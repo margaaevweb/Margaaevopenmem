@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marga AEV Aura</title>
+<style>
+html,body{
+  margin:0;padding:0;width:100%;height:100%;
+  background:black;overflow:hidden;
+  display:flex;justify-content:center;align-items:center;
+}
+.container{
+  width:100vw;
+  aspect-ratio:16/9;
+  max-height:100vh;
+  background:url('bg.jpg') center center no-repeat;
+  background-size:cover;
+  position:relative;
+  overflow:hidden;
+  animation:bgZoom 10s infinite alternate ease-in-out;
+}
+@keyframes bgZoom{
+  from{transform:scale(1);}
+  to{transform:scale(1.06);}
+}
+.loading-screen{
+  position:absolute; inset:0;
+  background:url('loading.jpg') center center no-repeat;
+  background-size:cover;
+  z-index:5;
+  transition:opacity 1s ease;
+}
+.enter-btn{
+  position:absolute;
+  bottom:12%; left:50%;
+  transform:translateX(-50%);
+  padding:14px 35px;
+  border:none;
+  border-radius:30px;
+  font-size:18px;
+  cursor:pointer;
+  z-index:10;
+  animation:pulse 1.5s infinite;
+}
+@keyframes pulse{
+  0%,100%{transform:translateX(-50%) scale(1);}
+  50%{transform:translateX(-50%) scale(1.08);}
+}
+/* eye aura glow simulation */
+.eye-glow{
+  position:absolute;
+  width:120px;
+  height:40px;
+  border-radius:50%;
+  filter:blur(18px);
+  background:rgba(255,255,255,.5);
+  animation:blink 2s infinite;
+}
+.eye-left{ top:38%; left:37%; }
+.eye-right{ top:38%; right:37%; }
+
+@keyframes blink{
+  0%, 100%{opacity:.2; transform:scaleY(1);}
+  40%{opacity:1; transform:scaleY(1.3);}
+  50%{opacity:.05; transform:scaleY(.1);}
+  60%{opacity:1; transform:scaleY(1.2);}
+}
+
+/* fog */
+.fog{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,.08), transparent);
+  animation:fogMove 8s linear infinite;
+}
+@keyframes fogMove{
+  from{transform:translateX(-100%);}
+  to{transform:translateX(100%);}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="loading-screen" id="loading"></div>
+  <div class="fog"></div>
+  <div class="eye-glow eye-left"></div>
+  <div class="eye-glow eye-right"></div>
+  <button class="enter-btn" id="enterBtn">ENTER</button>
+  <audio id="bgm" src="sound.mp3" loop></audio>
+</div>
+
+<script>
+function playStartSound(){
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'square';
+  osc.frequency.setValueAtTime(250, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.25);
+  gain.gain.setValueAtTime(0.2, ctx.currentTime);
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start();
+  osc.stop(ctx.currentTime + 0.3);
+}
+
+document.getElementById('enterBtn').onclick = function(){
+  playStartSound();
+  setTimeout(()=>{
+    document.getElementById('loading').style.opacity='0';
+    this.style.display='none';
+    document.getElementById('bgm').play();
+  },500);
+}
+</script>
+</body>
+</html>
